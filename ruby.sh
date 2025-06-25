@@ -1,54 +1,52 @@
 #!/bin/bash
 
-# Clone rbenv repository
-echo "Cloning rbenv repository..."
-git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+set -e
 
-# Build and install rbenv
-cd ~/.rbenv
-echo "Building and installing rbenv..."
-make
-sudo make install
+echo "🔧 Setting up rbenv..."
 
-# Set up rbenv in your shell
-echo "Setting up rbenv in your shell..."
-echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+# Define rbenv and plugin directories
+export RBENV_ROOT="$HOME/.rbenv"
+export PATH="$RBENV_ROOT/bin:$PATH"
 
-# Reload your shell configuration
-echo "Reloading shell configuration..."
+# Clone rbenv if not already present
+if [ ! -d "$RBENV_ROOT" ]; then
+    git clone https://github.com/rbenv/rbenv.git "$RBENV_ROOT"
+    echo "✅ rbenv cloned."
+fi
+
+# Initialize rbenv in shell
+if ! grep -q 'rbenv init' ~/.bashrc; then
+    {
+        echo 'export PATH="$HOME/.rbenv/bin:$PATH"'
+        echo 'eval "$(rbenv init -)"'
+    } >> ~/.bashrc
+    echo "✅ rbenv initialization appended to .bashrc"
+fi
+
+# Apply changes immediately
+eval "$(rbenv init -)"
 source ~/.bashrc
 
-# Go back to the home directory
-cd ~
+# Install ruby-build plugin
+PLUGIN_DIR="$RBENV_ROOT/plugins"
+mkdir -p "$PLUGIN_DIR"
 
-# Download and install ruby-build plugin
-echo "Downloading and installing ruby-build plugin..."
-wget -q https://github.com/rbenv/ruby-build/archive/refs/tags/v20250610.tar.gz
-tar -xzf v20250610.tar.gz
-mkdir -p ~/.rbenv/plugins
-mv ruby-build-*/ ~/.rbenv/plugins/ruby-build
+if [ ! -d "$PLUGIN_DIR/ruby-build" ]; then
+    git clone https://github.com/rbenv/ruby-build.git "$PLUGIN_DIR/ruby-build"
+    echo "✅ ruby-build plugin installed."
+fi
 
-# Source .bashrc to apply changes immediately
-echo "Sourcing .bashrc..."
-source ~/.bashrc
-echo ".bashrc has been sourced. Your environment is updated."
-
-# Install Ruby 3.4.4
-echo "Installing Ruby 3.4.4..."
-rbenv install 3.4.4
-rbenv global 3.4.4
-
-# Install Ruby development headers and other dependencies
-echo "Installing Ruby development headers and other dependencies..."
+# Install dependencies
+echo "📦 Installing Ruby dependencies..."
 sudo apt-get update
-sudo apt-get -qq -y install ruby-dev ruby-full ruby-all-dev ruby-ansi curl
+sudo apt-get install -y build-essential libssl-dev zlib1g-dev libreadline-dev curl
 
-# Cleanup
-echo "Cleaning up temporary files..."
-cd ~
-rm -rf v20250610.tar.gz ruby-build-* ~/.rbenv/ruby-build
+# Pick the latest stable Ruby version
+LATEST_VERSION=$(rbenv install -l | grep -E "^\s*[0-9]+\.[0-9]+\.[0-9]+$" | tail -1 | tr -d ' ')
 
-# Final message
-echo "Installation complete! Ruby 3.4.4 is now installed and set as the global version."
+echo "💎 Installing Ruby $LATEST_VERSION..."
+rbenv install -s "$LATEST_VERSION"
+rbenv global "$LATEST_VERSION"
+rbenv rehash
 
+echo "🎉 Ruby $LATEST_VERSION has been successfully installed and set as the global version."
