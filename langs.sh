@@ -43,20 +43,6 @@ sudo apt-get -qq -y install \
   libdebian-package-html-perl libconfig-model-dpkg-perl libnet-ldap-perl \
   liblocale-gettext-perl libgtk3-perl libterm-readline-gnu-perl weblint-perl
 
-# Ruby
-git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-~/.rbenv/bin/rbenv init || echo "⚠️ rbenv init failed"
-
-wget -q https://github.com/rbenv/ruby-build/archive/refs/tags/v20250610.tar.gz
-tar -xzf v20250610.tar.gz
-PREFIX=/usr/local ./ruby-build-*/install.sh
-\curl -sSL https://get.rvm.io | bash -s stable
-
-~/.rbenv/bin/rbenv install 3.44 || echo "⚠️ Ruby 3.44 install failed"
-
-sudo apt-get -qq -y install \
-  ruby-dev ruby-full ruby-all-dev ruby-ansi curl
-
 # NodeJS
 sudo apt-get -qq -y install \
   npm node-tap node-opener nodejs node-latest-version node-semver \
