@@ -1,5 +1,11 @@
 #!/bin/bash
 
+chmod +x *.sh
+
+rm -rf 1sp
+
+echo "Operations completed successfully."
+
 # Function to execute a script and check for errors
 run_script() {
     local script_name="$1"
