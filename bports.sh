@@ -56,10 +56,10 @@ echo "--------------------------------------------------------------------------
 read -p "Would you like to install the backports kernel? (Y/n): " response
 if [[ "$response" =~ ^[Yy]$ || -z "$response" ]]; then
     # Install necessary tools
-    sudo apt-get install -y lsb-release curl apt-transport-https
+    sudo apt-get install -y lsb-release curl apt-transport-https bison
 
     # Install backports kernel and headers
-    sudo apt-get -t bookworm-backports install -y linux-image-amd64 linux-headers-amd64 firmware-linux
+    sudo apt-get -t bookworm-backports install -y linux-image-amd64 linux-headers-amd64 firmware-linux meson
 
     # Update again to ensure latest packages
     echo "Running apt update again..."
