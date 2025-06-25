@@ -1,77 +1,57 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 # --- Bash Completion Setup ---
-
 echo "Installing bash-completion..."
 sudo apt-get -y install bash-completion
 
-# Ensure bash completion is enabled in ~/.bashrc
-if ! grep -wq 'bash_completion' ~/.bashrc; then
-    echo "Configuring ~/.bashrc for bash-completion..."
+if ! grep -q 'bash_completion' ~/.bashrc; then
+    echo "Adding bash-completion config to ~/.bashrc..."
     cat << 'EOF' >> ~/.bashrc
 
 # Enable bash completion if available
 if ! shopt -oq posix; then
-    if [ -f /usr/share/bash-completion/bash_completion ]; then
-        . /usr/share/bash-completion/bash_completion
-    elif [ -f /etc/bash_completion ]; then
-        . /etc/bash_completion
-    fi
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
 fi
 EOF
 fi
 
-# Source bashrc to apply changes immediately
-echo "Sourcing ~/.bashrc..."
-source ~/.bashrc
-
-# Ensure /etc/profile.d/bash_completion.sh is sourced
-if ! grep -wq 'source /etc/profile.d/bash_completion.sh' ~/.bashrc; then
-    echo "Adding source for /etc/profile.d/bash_completion.sh to ~/.bashrc..."
+if ! grep -q 'source /etc/profile.d/bash_completion.sh' ~/.bashrc; then
+    echo "Adding fallback bash_completion.sh to ~/.bashrc..."
     echo 'source /etc/profile.d/bash_completion.sh' >> ~/.bashrc
-    source /etc/profile.d/bash_completion.sh
 fi
 
 # --- Zsh Installation and Configuration ---
-
-echo "Installing Zsh and essential plugins..."
+echo "Installing Zsh and plugins..."
 sudo apt-get install -y zsh zsh-common zsh-autosuggestions zsh-syntax-highlighting zsh-theme-powerlevel9k
 
-# Prompt user to edit ~/.zshrc
-echo -e "\nYou may now customize your ~/.zshrc as needed."
-echo "Run 'zsh' to create or edit your .zshrc."
-read -p "Press ENTER after editing ~/.zshrc to continue..."
+touch ~/.zshrc
 
-# Install Oh My Zsh
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     echo "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 fi
 
-# Clone plugins
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
-    echo "Cloning zsh-autosuggestions..."
+[[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]] &&
     git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-fi
 
-if [ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
-    echo "Cloning zsh-completions..."
+[[ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]] &&
     git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
-fi
 
-# Update plugins list
-if grep -q '^plugins=' "$HOME/.zshrc"; then
-    sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-completions)/' "$HOME/.zshrc"
+if grep -q '^plugins=' ~/.zshrc; then
+    sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-completions)/' ~/.zshrc
 else
-    echo 'plugins=(git zsh-autosuggestions zsh-completions)' >> "$HOME/.zshrc"
+    echo 'plugins=(git zsh-autosuggestions zsh-completions)' >> ~/.zshrc
 fi
 
-# Append configuration for zsh-completions
-if ! grep -q 'zsh-completions/src' "$HOME/.zshrc"; then
-    cat << 'EOF' >> "$HOME/.zshrc"
+if ! grep -q 'zsh-completions/src' ~/.zshrc; then
+    cat << 'EOF' >> ~/.zshrc
 
 # Enable zsh-completions
 fpath+=("$ZSH_CUSTOM/plugins/zsh-completions/src")
@@ -79,14 +59,4 @@ autoload -U compinit && compinit
 EOF
 fi
 
-# Source ~/.zshrc
-echo "Sourcing ~/.zshrc..."
-source "$HOME/.zshrc"
-
-# Wait
-wait
-
-# Reboot 
-echo "Installation and configuration complete."
-read -p "Press ENTER to reboot or Ctrl+C to cancel." 
-sudo reboot
+echo "Configuration complete. Please restart your terminal session to activate changes."
