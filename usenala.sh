@@ -1,12 +1,23 @@
 #!/bin/bash
-username=$(id -u -n 1000)
-# Configure bash to use nala wrapper instead of apt
-usenala="/home/$username/.use-nala"
+
+# Install nala and check if it's successful
+if ! sudo apt-get -y install nala; then
+    echo "❌ Failed to install nala. Aborting."
+    exit 1
+fi
+
+# Identify the first non-system user (excluding nologin/sync users)
+username=$(getent passwd {1000..1100} | grep -vE 'nologin|false' | cut -d: -f1 | head -n1)
+userhome=$(eval echo "~$username")
+
+usenala="$userhome/.use-nala"
 rusenala="/root/.use-nala"
-ubashrc="/home/$username/.bashrc"
+ubashrc="$userhome/.bashrc"
 rbashrc="/root/.bashrc"
+
+# User-level nala wrapper
 if [ ! -f "$usenala" ]; then
-cat << \EOF > "$usenala"
+    cat << 'EOF' > "$usenala"
 apt() {
   command nala "$@"
 }
@@ -19,22 +30,21 @@ sudo() {
   fi
 }
 EOF
-cat << EOF >> "$ubashrc"
-if [ -f "$usenala" ]; then
-        . "$usenala"
-fi
-EOF
+    echo "[ -f \"$usenala\" ] && . \"$usenala\"" >> "$ubashrc"
+    chmod +x "$usenala"
+    sudo -u "$username" bash -c "source \"$ubashrc\""
 fi
 
+# Root-level nala wrapper
 if [ ! -f "$rusenala" ]; then
-cat << \EOF > "$rusenala"
+    cat << 'EOF' > "$rusenala"
 apt() {
   command nala "$@"
 }
 EOF
-cat << EOF >> "$rbashrc"
-if [ -f "$rusenala" ]; then
-        . "$rusenala"
+    echo "[ -f \"$rusenala\" ] && . \"$rusenala\"" >> "$rbashrc"
+    chmod +x "$rusenala"
+    source "$rbashrc"
 fi
-EOF
-fi
+
+echo "✅ Nala wrapper installed and configured for user and root environments."
