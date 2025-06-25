@@ -11,7 +11,7 @@ else
     echo "Failed to remove existing sources.list or it does not exist."
 fi
 
-sudo apt-get -y install firmware-linux-nonfree
+sudo apt-get update
 
 # Create a new sources.list with Debian Bookworm repositories
 cat <<EOL | sudo tee /etc/apt/sources.list > /dev/null
@@ -35,7 +35,7 @@ echo "Initial repositories added and package list updated."
 echo "-------------------------------------------------------------------------------"
 
 # Install fasttrack packages
-if sudo apt-get -y install sudo apt-get -y install firmware-linux-nonfree fasttrack-archive-keyring devscripts; then
+if sudo apt-get -y install firmware-linux-nonfree fasttrack-archive-keyring devscripts; then
     echo "Required packages installed."
 else
     echo "Failed to install required packages." >&2
