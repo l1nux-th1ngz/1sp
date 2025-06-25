@@ -37,14 +37,14 @@ install_polkits() {
     libpolkit-agent-1-0 libpolkit-agent-1-dev gir1.2-polkit-1.0 policykit-1-gnome
 }
 
-# Install firmware and drivers
+# Install firmware and a few others
 install_firmware() {
   echo "Installing firmware and drivers..."
   sudo apt-get -y install \
     firmware-misc-nonfree initramfs-tools intel-microcode intel-media-va-driver \
     intel-media-va-driver:i386 intel-media-va-driver-non-free iucode-tool \
     libgl1-mesa-dri xcvt libxcvt0 libxcvt-dev xbacklight xbindkeys xvkbd \
-    libnotify-bin libnotify-dev nickle cairo-5c
+    libnotify-bin libnotify-dev nickle cairo-5c gettext intltool dbus-x11
 }
 
 # Validate services and drivers
