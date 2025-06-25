@@ -7,8 +7,9 @@ sudo apt-get update
 
 echo "[*] Installing required packages..."
 sudo apt-get install -y \
-  libpcap0 graphviz libgraphviz-dev gsfonts fonts-liberation2 cm-super-minimal dvipng \
+  libpcap0.8 graphviz libgraphviz-dev gsfonts fonts-liberation2 cm-super-minimal dvipng \
   fonts-staypuft ghostscript texlive-fonts-recommended tipa tex-gyre fonts-texgyre \
   fonts-texgyre-math tex-common debhelper dh-make librsvg2-common libcurl4-gnutls-dev \
-  dh-python dpkg dpkg-dev python3-build python3-install sox tcpdump tcpreplay dhcpig \
-  netdiscover ipwatchd nmap net-tools iproute2 moreutils libxrender-dev libxrender1
+  dh-python dpkg dpkg-dev python3-build python3-installer sox tcpdump tcpreplay dhcpig \
+  netdiscover ipwatchd nmap net-tools iproute2 moreutils libxrender-dev libxrender1 \
+  libpcap0.8-dev
