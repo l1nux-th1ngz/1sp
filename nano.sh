@@ -1,16 +1,13 @@
 #!/bin/bash
 
 # Globals
-TERM_EMULATOR=$(command -v x-terminal-emulator || command -v gnome-terminal || command -v xterm)
+TERM_EMULATOR=$(command -v terminator || command -v kitty || command -v alacritty)
 
-check_internet() {
-    if ping -c 1 8.8.8.8 &> /dev/null; then
-        echo "✅ Internet connection detected."
-    else
-        echo "❌ No internet connection. Exiting."
-        exit 1
-    fi
-}
+# Verify terminal emulator
+if [ -z "$TERM_EMULATOR" ]; then
+    echo "[-] No supported terminal emulator found (terminator, kitty, alacritty). Please install one."
+    exit 1
+fi
 
 install_nano() {
     sudo apt-get update
@@ -37,7 +34,10 @@ Keywords=editor;texteditor;text;terminal;
 MimeType=text/plain;
 EOF
 
-    sudo update-desktop-database
+    # Ensure desktop database is updated
+    if command -v update-desktop-database > /dev/null; then
+        sudo update-desktop-database
+    fi
 }
 
 configure_nanorc() {
@@ -48,7 +48,7 @@ configure_nanorc() {
     fi
 
     local rc="$HOME/.config/nano/nanorc"
-    if ! grep -q "## Custom nano configuration" "$rc" 2>/dev/null; then
+    if [ ! -f "$rc" ] || ! grep -q "## Custom nano configuration" "$rc"; then
         cat <<EOF >> "$rc"
 
 ## Custom nano configuration
@@ -77,7 +77,7 @@ setup_sxhkd_binding() {
     local sxhkdrc="$HOME/.config/sxhkd/sxhkdrc"
     local bind='super + n'
     local fallback='shift + super + n'
-    local cmd="\t$TERM_EMULATOR -T 'Nano' -e nano"
+    local cmd="$TERM_EMULATOR -T 'Nano' -e nano"
 
     if [ -f "$sxhkdrc" ]; then
         if ! grep -q "# nano editor." "$sxhkdrc"; then
@@ -90,7 +90,8 @@ setup_sxhkd_binding() {
             else
                 notify-send -t 8000 --urgency=low "Nano keybinds already used. Add manually if needed."
             fi
-            pkill -USR1 -x sxhkd
+            # Send USR1 signal only if sxhkd is running
+            pgrep -x sxhkd > /dev/null && pkill -USR1 -x sxhkd
         fi
     else
         echo "sxhkdrc not found at $sxhkdrc. Skipping keybinding setup."
