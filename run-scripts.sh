@@ -1,15 +1,26 @@
 #!/bin/bash
 
+# Make all .sh files executable
 chmod +x *.sh
 
-rm -rf 1sp
-
-echo "Operations completed successfully."
+# Remove the specified directory only if it exists
+DIR="1sp"
+if [ -d "$DIR" ]; then
+    rm -rf "$DIR"
+    echo "Unneeded directory '$DIR' removed successfully."
+else
+    echo "Directory '$DIR' not found; skipping removal."
+fi
 
 # Function to execute a script and check for errors
 run_script() {
     local script_name="$1"
     local use_sudo="$2"
+
+    if [ ! -f "$script_name" ]; then
+        echo "Warning: $script_name not found; skipping."
+        return
+    fi
 
     echo "Running $script_name..."
     if [ "$use_sudo" == "true" ]; then
@@ -25,19 +36,28 @@ run_script() {
     fi
 }
 
-# Execute each script in sequence
-run_script "zsh_debian.sh" false
-run_script "usenala.sh" true
-run_script "bports.sh" false
-run_script "charm-repo.sh" false
-run_script "langs.sh" false
-run_script "go124.sh" false
-run_script "rust.sh" false
-run_script "jq.sh" false
-run_script "ruby.sh" false
-run_script "nano.sh" false
-run_script "polkit.sh" false
-run_script "display-servers.sh" false
-run_script "dg.sh" false
+# Array of scripts with sudo flags (true/false)
+scripts=(
+    "usenala.sh:true"
+    "zsh_debian.sh:false"
+    "bports.sh:false"
+    "charm-repo.sh:false"
+    "langs.sh:false"
+    "go124.sh:false"
+    "rust.sh:false"
+    "jq.sh:false"
+    "ruby.sh:false"
+    "nano.sh:false"
+    "polkit.sh:false"
+    "display-servers.sh:false"
+    "dg.sh:false"
+)
+
+# Execute scripts with apt update in between
+for entry in "${scripts[@]}"; do
+    IFS=":" read -r script use_sudo <<< "$entry"
+    run_script "$script" "$use_sudo"
+    sudo apt-get update -qq
+done
 
 echo "All scripts executed successfully!"
