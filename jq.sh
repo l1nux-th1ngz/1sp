@@ -4,7 +4,7 @@
 wget -q -O jq-linux-amd64 https://github.com/jqlang/jq/releases/download/jq-1.8.0/jq-linux-amd64
 
 # Move to /usr/local/bin  
-sudo mv jq-linux-amd64 /usr/local/bin/jq
+sudo mv jq-linux-amd64 /usr/local/bin
 
 # Set permissions
 sudo chmod +x /usr/local/bin/jq
