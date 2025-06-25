@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e  # Exit on error
+
+echo "Installing lock screen dependencies..."
+sudo apt-get update
+sudo apt-get install -y xss-lock i3lock i3lock-fancy
+
+echo "Installing i3lock-color..."
+git clone https://github.com/Raymo111/i3lock-color.git
+cd i3lock-color
+./build.sh
+./install-i3lock-color.sh
+cd .. && rm -rf i3lock-color  # Cleanup
+
+echo "Installing betterlockscreen..."
+wget -qO- https://raw.githubusercontent.com/betterlockscreen/betterlockscreen/main/install.sh | sudo bash -s system
+
+echo "Configuring lock screen settings..."
+betterlockscreen -w dim
+
+# Add shortcut to sxhkd configuration
+SXHKD_CONFIG="$HOME/.config/sxhkd/sxhkdrc"
+LOCK_COMMAND="ctrl + alt + l
+    betterlockscreen -l dim"
+
+echo "Adding lock command to $SXHKD_CONFIG..."
+if ! grep -q "betterlockscreen -l dim" "$SXHKD_CONFIG"; then
+    echo "$LOCK_COMMAND" >> "$SXHKD_CONFIG"
+    echo "Shortcut added successfully."
+else
+    echo "Shortcut already exists."
+fi
+
+echo "Installation complete!"

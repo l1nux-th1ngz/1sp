@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Refresh repositories
+sudo apt-get update
+
+# Install dependencies
+sudo apt-get -y install imlib2 ibcurl4-openssl-dev libcurl4-gnutls-dev libpng-dev zlib1g-dev \
+libx11-6 libxt-dev ibxinerama-dev libexif-dev libexif12 libimage-exiftool-perl exif libmagic-dev file
+
+# Download feh source
+wget https://feh.finalrewind.org/feh-3.10.3.tar.bz2
+
+# Extract the archive
+tar -xjf feh-3.10.3.tar.bz2
+
+# Change to the extracted directory
+cd feh-3.10.3
+
+# Build and install feh
+make
+sudo make install app=1 exif=1 inotify=1 magic=1
+
+# Create configuration directories if they don't exist
+mkdir -p ~/.config/feh
+mkdir -p ~/.config/feh/themes
+
+# Move scripts directory
+mv scripts ~/.config/feh
+chmod +x * ~/.config/feh/scripts
+
+# Move keys file
+mv test/config/keys/feh/keys ~/.config/feh
+
+# Move themes directory
+mv test/config/themes/feh/themes ~/.config/feh
+
+# Move themes directory in examples
+cd examples
+mv themes ~/.config/feh/themes
+
+# Move remaining files to ~/.config/feh
+mv * ~/.config/feh
+
+# Return to home directory
+cd ~
+
+# Clean up
+rm -rf feh-3.10.3 feh-3.10.3.tar.bz2
+
+echo "Feh installation and setup complete."

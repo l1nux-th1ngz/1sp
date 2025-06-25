@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Clone
+git clone https://github.com/trapd00r/LS_COLORS.git
+cd LS_COLORS
+
+# Move the script
+mv lscolors.sh ~/.local/share/
+
+# Set permissions
+chmod +x ~/.local/share/lscolors.sh
+
+# Return to home
+cd ~
+
+# Source the script to bash
+echo "Sourcing in ~/.bashrc"
+echo 'source ~/.local/share/lscolors.sh' >> ~/.bashrc
+
+
+# Source the script to zsh
+ echo "Sourcing in ~/.zshrc"
+ echo 'source ~/.local/share/lscolors.sh' >> ~/.zshrc
+
+# Cleanup: remove the cloned repository
+rm -rf ~/LS_COLORS
+
+echo "Done"
