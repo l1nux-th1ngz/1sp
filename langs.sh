@@ -19,7 +19,7 @@ sudo apt-get -qq -y install \
   python3-cryptography python3-cryptography-vectors python3-matplotlib python3-pyx \
   python3-cairocffi python3-cairosvg python3-gi python3-gi-cairo python3-scipy \
   python3-sip python3-tornado python3-twisted python3-pampy python3-pycurl \
-  python3-serial python3-wxgtk python3-parallel python3-psutil python3-configobj \
+  python3-serial python3-wxgtk4.0 python3-parallel python3-psutil python3-configobj \
   python3-distutils python3-tk python3-wxgtk-media4.0 python3-wxgtk-webview4.0
 
 # Java
