@@ -26,7 +26,7 @@ fi
 echo "Sourcing ~/.bashrc..."
 source ~/.bashrc
 
-# Optional: ensure /etc/profile.d/bash_completion.sh is sourced
+# Ensure /etc/profile.d/bash_completion.sh is sourced
 if ! grep -wq 'source /etc/profile.d/bash_completion.sh' ~/.bashrc; then
     echo "Adding source for /etc/profile.d/bash_completion.sh to ~/.bashrc..."
     echo 'source /etc/profile.d/bash_completion.sh' >> ~/.bashrc
@@ -82,6 +82,9 @@ fi
 # Source ~/.zshrc
 echo "Sourcing ~/.zshrc..."
 source "$HOME/.zshrc"
+
+# Wait
+wait
 
 # Reboot 
 echo "Installation and configuration complete."
