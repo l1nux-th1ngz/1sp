@@ -6,6 +6,18 @@ set -e
 real_user="${SUDO_USER:-$(logname)}"
 real_home="/home/$real_user"
 
+# Check if the user is root
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root or with sudo."
+    exit 1
+fi
+
+# Check if bspwm is installed
+if ! command -v bspwm &> /dev/null; then
+    echo "BSPWM is not installed. Please install it before running this script."
+    exit 1
+fi
+
 echo "🧩 Installing LightDM and GTK greeter..."
 sudo apt-get update
 sudo apt-get -y install lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
@@ -15,7 +27,7 @@ sudo tee /usr/bin/bspwm-session > /dev/null << 'EOF'
 #!/bin/bash
 exec bspwm
 EOF
-chmod +x /usr/bin/bspwm-session
+sudo chmod +x /usr/bin/bspwm-session
 
 echo "📝 Registering bspwm session with LightDM..."
 sudo tee /usr/share/xsessions/bspwm.desktop > /dev/null << 'EOF'
@@ -38,10 +50,7 @@ allow-user-switching=true
 EOF
 
 echo "🔄 Setting ownership..."
-chown "$real_user:$real_user" /usr/bin/bspwm-session /usr/share/xsessions/bspwm.desktop
+sudo chown "$real_user:$real_user" /usr/bin/bspwm-session /usr/share/xsessions/bspwm.desktop
 
 echo "🚀 Restarting LightDM to apply changes..."
-systemctl restart lightdm
-
-
-
+sudo systemctl restart lightdm
